@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/google/uuid"
 	"github.com/sirupsen/logrus"
 )
 
@@ -32,17 +31,12 @@ func (f *RequestLoggerFormatter) Format(entry *logrus.Entry) ([]byte, error) {
 	return []byte(fmt.Sprintf("[%s] %s | %s\n", time, level, entry.Message)), nil
 }
 
-func (logger *RequestLogger) logRequest(api string, userId *uuid.UUID, request interface{}) {
-	userIdString := "null"
-	if userId != nil {
-		userIdString = userId.String()
-	}
-
+func (logger *RequestLogger) logRequest(api string, request interface{}) {
 	requestString := "null"
 	if request != nil {
 		requestByte, _ := json.Marshal(request)
 		requestString = string(requestByte)
 	}
 
-	logger.Info(fmt.Sprintf("%s: %s, %s", api, userIdString, requestString))
+	logger.Info(fmt.Sprintf("%s: %s", api, requestString))
 }

@@ -5,7 +5,7 @@ import (
 
 	"go.mongodb.org/mongo-driver/bson"
 
-	"github.com/njupt-sast/atsast-apply-module-server/entity"
+	"github.com/njupt-sast/atsast-apply-module-server/model/entity"
 )
 
 func ReadExamList() ([]entity.Exam, error) {
@@ -18,9 +18,9 @@ func ReadExamList() ([]entity.Exam, error) {
 	}
 
 	examList := make([]entity.Exam, 0)
-	if err = cur.All(ctx, &examList); err != nil {
+	err = cur.All(ctx, &examList)
+	if err != nil {
 		return nil, err
 	}
-
 	return examList, nil
 }

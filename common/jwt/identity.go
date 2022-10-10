@@ -7,32 +7,29 @@ import (
 	"github.com/google/uuid"
 )
 
+var (
+	identityValidTime = 7 * 24 * time.Hour
+)
+
 type Identity struct {
 	Uid *uuid.UUID
 }
 
-var identityValidTime = 7 * 24 * time.Hour
-
-func NewIdentityJwtString(identity *Identity) (*string, error) {
-	jwtString, err := NewString(map[string]interface{}{
+func NewIdentityString(identity *Identity) (*string, error) {
+	return NewString(map[string]any{
 		"nbf": time.Now().Unix(),
 		"exp": time.Now().Add(identityValidTime).Unix(),
 		"uid": identity.Uid.String(),
 	})
-	if err != nil {
-		return nil, err
-	}
-
-	return jwtString, nil
 }
 
-func ParseIdentityJwtString(identityJwtString *string) (interface{}, error) {
+func ParseIdentityJwtString(identityJwtString *string) (*Identity, error) {
 	claims, err := Parse(*identityJwtString)
 	if err != nil {
 		return nil, err
 	}
 
-	uid, err := ExtractUUid(claims, "uid")
+	uid, err := extractUUid(claims, "uid")
 	if err != nil {
 		return nil, err
 	}
@@ -43,11 +40,11 @@ func ParseIdentityJwtString(identityJwtString *string) (interface{}, error) {
 	return &identity, nil
 }
 
-func InjectIdentity(c *gin.Context, identity interface{}) error {
+func InjectIdentity(c *gin.Context, identity *Identity) error {
 	c.Set("identity", identity)
 	return nil
 }
 
-func ExtractIdentity(c *gin.Context) *Identity {
+func MustExtractIdentity(c *gin.Context) *Identity {
 	return c.MustGet("identity").(*Identity)
 }

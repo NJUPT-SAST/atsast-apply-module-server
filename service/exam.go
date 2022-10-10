@@ -1,21 +1,17 @@
 package service
 
 import (
-	"go.mongodb.org/mongo-driver/mongo"
-
-	"github.com/njupt-sast/atsast-apply-module-server/dao"
-	"github.com/njupt-sast/atsast-apply-module-server/entity"
+	"github.com/njupt-sast/atsast-apply-module-server/model/dao"
+	"github.com/njupt-sast/atsast-apply-module-server/model/entity"
 )
 
 func ReadExamList() ([]entity.Exam, error) {
 	examList, err := dao.ReadExamList()
-	if err == mongo.ErrNoDocuments {
-		return nil, nil
+	if err == dao.NoDocumentsErr {
+		return examList, nil
 	}
-
 	if err != nil {
-		return nil, err
+		return nil, CallDatabaseErr
 	}
-
 	return examList, nil
 }

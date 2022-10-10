@@ -9,20 +9,22 @@ import (
 	"github.com/njupt-sast/atsast-apply-module-server/config"
 )
 
-func NewString(claims map[string]interface{}) (*string, error) {
+var (
+	parserOption	 = jwt.WithValidMethods([]string{"HS512"})
+	parseKeySelector = func(_ *jwt.Token) (any, error) {
+		return config.JwtSecret, nil
+	}
+)
+
+func NewString(claims map[string]any) (*string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS512, jwt.MapClaims(claims))
 	identityJwtString, err := token.SignedString(config.JwtSecret)
 	if err != nil {
 		return nil, err
 	}
+
 	return &identityJwtString, nil
 }
-
-func parseKeySelector(_ *jwt.Token) (interface{}, error) {
-	return config.JwtSecret, nil
-}
-
-var parserOption = jwt.WithValidMethods([]string{"HS512"})
 
 func Parse(jwtString string) (*jwt.MapClaims, error) {
 	token, err := jwt.Parse(jwtString, parseKeySelector, parserOption)
@@ -30,16 +32,17 @@ func Parse(jwtString string) (*jwt.MapClaims, error) {
 		return nil, err
 	}
 
-	if claims, ok := token.Claims.(jwt.MapClaims); !ok || !token.Valid {
+	claims, ok := token.Claims.(jwt.MapClaims)
+	if !ok || !token.Valid {
 		return nil, err
-	} else {
-		return &claims, nil
 	}
+
+	return &claims, nil
 }
 
-func ExtractUUid(claims *jwt.MapClaims, field string) (*uuid.UUID, error) {
+func extractUUid(claims *jwt.MapClaims, field string) (*uuid.UUID, error) {
 	fieldStringValue, ok := (*claims)[field].(string)
-	if !ok {
+	if !ok || fieldStringValue == "" {
 		return nil, errors.New("extracting field error")
 	}
 

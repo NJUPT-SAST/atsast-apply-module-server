@@ -9,10 +9,10 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 
-	"github.com/njupt-sast/atsast-apply-module-server/entity"
+	"github.com/njupt-sast/atsast-apply-module-server/model/entity"
 )
 
-func FindUserWithCreateIfNotExist(weChatId *string) (*entity.User, error) {
+func ReadUserWithCreateIfNotExist(weChatId *string) (*entity.User, error) {
 	ctx, cancel := context.WithTimeout(context.TODO(), timeLimit)
 	defer cancel()
 
@@ -20,7 +20,7 @@ func FindUserWithCreateIfNotExist(weChatId *string) (*entity.User, error) {
 	newUser := entity.User{
 		UserId:   &newUserId,
 		WeChatId: weChatId,
-		Role:     &entity.GeneralUserRole,
+		Role:     &entity.CommonUser,
 	}
 
 	oldUser := entity.User{}
@@ -34,25 +34,29 @@ func FindUserWithCreateIfNotExist(weChatId *string) (*entity.User, error) {
 	if err == mongo.ErrNoDocuments {
 		return &newUser, nil
 	}
-
 	if err != nil {
 		return nil, err
 	}
-
 	return &oldUser, nil
 }
 
-func ReadUserBySpecifyField(fieldName string, fieldValue interface{}) (*entity.User, error) {
+func ReadUserListBySpecifyField(fieldName string, fieldValue interface{}) ([]entity.User, error) {
 	ctx, cancel := context.WithTimeout(context.TODO(), timeLimit)
 	defer cancel()
-
-	var user entity.User
-	err := UserColl.FindOne(ctx, bson.D{{Key: fieldName, Value: fieldValue}}).Decode(&user)
+	cur, err := UserColl.Find(
+		ctx,
+		bson.D{{Key: fieldName, Value: fieldValue}},
+	)
 	if err != nil {
 		return nil, err
 	}
 
-	return &user, nil
+	userList := make([]entity.User, 0)
+	err = cur.All(ctx, &userList)
+	if err != nil {
+		return nil, err
+	}
+	return userList, nil
 }
 
 func ReadUser(userId *uuid.UUID) (*entity.User, error) {
@@ -60,11 +64,13 @@ func ReadUser(userId *uuid.UUID) (*entity.User, error) {
 	defer cancel()
 
 	var user entity.User
-	err := UserColl.FindOne(ctx, bson.D{{Key: "userId", Value: userId}}).Decode(&user)
+	err := UserColl.FindOne(
+		ctx,
+		bson.D{{Key: "userId", Value: userId}},
+	).Decode(&user)
 	if err != nil {
 		return nil, err
 	}
-
 	return &user, nil
 }
 
@@ -79,6 +85,9 @@ func UpdateUserRole(userId *uuid.UUID, userRole *entity.UserRole) error {
 			{Key: "role", Value: userRole},
 		}}},
 	)
+	if result.Err() == mongo.ErrNoDocuments {
+		return NoDocumentsErr
+	}
 	return result.Err()
 }
 
@@ -93,6 +102,9 @@ func UpdateUserProfile(userId *uuid.UUID, userProfile *entity.UserProfile) error
 			{Key: "profile", Value: userProfile},
 		}}},
 	)
+	if result.Err() == mongo.ErrNoDocuments {
+		return NoDocumentsErr
+	}
 	return result.Err()
 }
 
@@ -113,5 +125,8 @@ func UpdateUserScore(userId *uuid.UUID, examId *string, userScoreMap *entity.Use
 		bson.D{{Key: "userId", Value: userId}},
 		bson.D{{Key: "$set", Value: fieldList}},
 	)
+	if result.Err() == mongo.ErrNoDocuments {
+		return NoDocumentsErr
+	}
 	return result.Err()
 }

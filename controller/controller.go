@@ -1,86 +1,50 @@
 package controller
 
 import (
-	"github.com/gin-gonic/gin"
-	"github.com/google/uuid"
+	"net/http"
 
-	"github.com/njupt-sast/atsast-apply-module-server/common/jwt"
-	"github.com/njupt-sast/atsast-apply-module-server/controller/stdrsp"
-	"github.com/njupt-sast/atsast-apply-module-server/logger"
+	"github.com/gin-gonic/gin"
+
+	"github.com/njupt-sast/atsast-apply-module-server/controller/api"
+	"github.com/njupt-sast/atsast-apply-module-server/controller/response"
 )
 
-func responseBindRequestError(c *gin.Context) {
-	stdrsp.ResponseResult(c, stdrsp.Response(stdrsp.BadRequest).Msg(stdrsp.BadRequestErrMsg))
-}
+var (
+	CheckHealth       = NewPureController(api.CheckHealth)
+	ReadConfig        = NewPureController(api.ReadConfig)
+	ReadExamList      = NewPureController(api.ReadExamList)
+	Login             = NewController[*api.LoginRequest](api.LoginRequestParser, api.LoginRequestHandler)
+	ReadInvitation    = NewController[*api.ReadInvitationRequest](api.ReadInvitationRequestParser, api.ReadInvitationRequestHandler)
+	ReadUser          = NewController[*api.ReadUserRequest](api.ReadUserRequestParser, api.ReadUserRequestHandler)
+	ReadUserProfile   = NewController[*api.ReadUserProfileRequest](api.ReadUserProfileRequestParser, api.ReadUserProfileRequestHandler)
+	UpdateUserProfile = NewController[*api.UpdateUserProfileRequest](api.UpdateUserProfileRequestParser, api.UpdateUserProfileRequestHandler)
+	ReadUserScore     = NewController[*api.ReadUserScoreRequest](api.ReadUserScoreRequestParser, api.ReadUserScoreRequestHandler)
+	UpdateUserScore   = NewController[*api.UpdateUserScoreRequest](api.UpdateUserScoreRequestParser, api.UpdateUserScoreRequestHandler)
+)
 
-func Health(c *gin.Context) {
-	stdrsp.ResponseResult(c, stdrsp.Response(stdrsp.Success))
-}
+type PureRequestHandlerFunc func() *response.Response
 
-func ReadConfig(c *gin.Context) {
-	stdrsp.ResponseResult(c, readConfig())
-}
-
-func Login(c *gin.Context) {
-	request := &loginRequest{}
-	if err := c.ShouldBindJSON(request); err != nil {
-		responseBindRequestError(c)
-		return
+func NewPureController(requestHandler PureRequestHandlerFunc) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		c.JSON(http.StatusOK, requestHandler())
 	}
-
-	stdrsp.ResponseResult(c, login(request))
 }
 
-func ReadInvitation(c *gin.Context) {
-	identity := jwt.ExtractIdentity(c)
-	code := c.Query("code")
+type RequestParserFunc[T any] func(*gin.Context) (T, error)
 
-	stdrsp.ResponseResult(c, readInvitation(identity, &code))
-}
+type RequestHandlerFunc[T any] func(T) *response.Response
 
-func ReadUserProfile(c *gin.Context) {
-	identity := jwt.ExtractIdentity(c)
-	requestUserId := uuid.MustParse(c.Param("userId"))
+func NewController[T any](
+	requestParser RequestParserFunc[T],
+	requestHandler RequestHandlerFunc[T],
+) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		request, err := requestParser(c)
+		if err != nil {
+			c.Status(http.StatusBadRequest)
+			return
+		}
 
-	stdrsp.ResponseResult(c, readUserProfile(identity, &requestUserId))
-}
-
-func UpdateUserProfile(c *gin.Context) {
-	identity := jwt.ExtractIdentity(c)
-	requestUserId := uuid.MustParse(c.Param("userId"))
-
-	request := &updateUserProfileRequest{}
-	if err := c.ShouldBindJSON(request); err != nil {
-		responseBindRequestError(c)
-		return
+		c.JSON(http.StatusOK, requestHandler(request))
 	}
-
-	logger.LogRequest("UpdateUserProfile", identity.Uid, request)
-	stdrsp.ResponseResult(c, updateUserProfile(identity, &requestUserId, request))
-}
-
-func ReadExamList(c *gin.Context) {
-	stdrsp.ResponseResult(c, readExamList())
-}
-
-func ReadUserScore(c *gin.Context) {
-	identity := jwt.ExtractIdentity(c)
-	requestUserId := uuid.MustParse(c.Param("userId"))
-	examId := c.Query("examId")
-
-	stdrsp.ResponseResult(c, readUserScore(identity, &examId, &requestUserId))
-}
-
-func UpdateUserScore(c *gin.Context) {
-	identity := jwt.ExtractIdentity(c)
-	requestUserId := uuid.MustParse(c.Param("userId"))
-
-	request := &updateUserScoreRequest{}
-	if err := c.ShouldBindJSON(request); err != nil {
-		responseBindRequestError(c)
-		return
-	}
-
-	logger.LogRequest("UpdateUserScore", identity.Uid, request)
-	stdrsp.ResponseResult(c, updateUserScore(identity, &requestUserId, request))
 }

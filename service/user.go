@@ -2,61 +2,78 @@ package service
 
 import (
 	"github.com/google/uuid"
-	"go.mongodb.org/mongo-driver/mongo"
 
-	"github.com/njupt-sast/atsast-apply-module-server/dao"
-	"github.com/njupt-sast/atsast-apply-module-server/entity"
+	"github.com/njupt-sast/atsast-apply-module-server/model/dao"
+	"github.com/njupt-sast/atsast-apply-module-server/model/entity"
 )
 
-func ReadUserIdWithCreateIfNotExist(weChatId *string) (*uuid.UUID, error) {
-	user, err := dao.FindUserWithCreateIfNotExist(weChatId)
-	if err != nil {
-		return nil, err
+func IsAdmin(userId *uuid.UUID) (bool, error) {
+	user, err := dao.ReadUser(userId)
+	if err == dao.NoDocumentsErr {
+		return false, NotFoundErr
 	}
-
-	return user.UserId, err
+	if err != nil {
+		return false, CallDatabaseErr
+	}
+	return user.Role.IsAdmin(), nil
 }
 
-func IsAdmin(userRole *entity.UserRole) bool {
-	return userRole != nil && *userRole == entity.AdminUserRole
+func ReadUserWithCreateIfNotExist(weChatId *string) (*entity.User, error) {
+	return dao.ReadUserWithCreateIfNotExist(weChatId)
 }
 
 func ReadUser(userId *uuid.UUID) (*entity.User, error) {
 	user, err := dao.ReadUser(userId)
-	if err == mongo.ErrNoDocuments {
-		return nil, DocumentNotFoundError
+	if err == dao.NoDocumentsErr {
+		return nil, NotFoundErr
 	}
-
 	if err != nil {
-		return nil, err
+		return nil, CallDatabaseErr
 	}
-
 	return user, nil
+}
+
+func ReadUserBySpecifyProfileField(fieldName string, fieldValue interface{}) ([]entity.User, error) {
+	userList, err := dao.ReadUserListBySpecifyField("profile."+fieldName, fieldValue)
+	if err == dao.NoDocumentsErr {
+		return nil, NotFoundErr
+	}
+	if err != nil {
+		return nil, CallDatabaseErr
+	}
+	return userList, nil
 }
 
 func UpdateUserRole(userId *uuid.UUID, userRole *entity.UserRole) error {
 	err := dao.UpdateUserRole(userId, userRole)
-	if err == mongo.ErrNoDocuments {
-		return DocumentNotFoundError
+	if err == dao.NoDocumentsErr {
+		return NotFoundErr
 	}
+	if err != nil {
+		return CallDatabaseErr
+	}
+	return nil
 
-	return err
 }
 
 func UpdateUserProfile(userId *uuid.UUID, userProfile *entity.UserProfile) error {
 	err := dao.UpdateUserProfile(userId, userProfile)
-	if err == mongo.ErrNoDocuments {
-		return DocumentNotFoundError
+	if err == dao.NoDocumentsErr {
+		return NotFoundErr
 	}
-
-	return err
+	if err != nil {
+		return CallDatabaseErr
+	}
+	return nil
 }
 
 func UpdateUserScore(userId *uuid.UUID, examId *string, userScoreMap *entity.UserScoreMap) error {
 	err := dao.UpdateUserScore(userId, examId, userScoreMap)
-	if err == mongo.ErrNoDocuments {
-		return DocumentNotFoundError
+	if err == dao.NoDocumentsErr {
+		return NotFoundErr
 	}
-
-	return err
+	if err != nil {
+		return CallDatabaseErr
+	}
+	return nil
 }

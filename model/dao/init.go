@@ -38,7 +38,7 @@ func init() {
 	// create unique index for user collection
 	UserColl = client.Database(config.Database.Name).Collection("user")
 	if _, err = UserColl.Indexes().CreateOne(ctx, mongo.IndexModel{
-		Keys:    bson.D{{Key: "userId", Value: 1}},
+		Keys:	bson.D{{Key: "userId", Value: 1}},
 		Options: options.Index().SetUnique(true).SetName("userId"),
 	}); err != nil {
 		panic(err)
@@ -47,7 +47,7 @@ func init() {
 	// create unique index for exam collection
 	ExamColl = client.Database(config.Database.Name).Collection("exam")
 	if _, err = ExamColl.Indexes().CreateOne(ctx, mongo.IndexModel{
-		Keys:    bson.D{{Key: "examId", Value: 1}},
+		Keys:	bson.D{{Key: "examId", Value: 1}},
 		Options: options.Index().SetUnique(true).SetName("examId"),
 	}); err != nil {
 		panic(err)
@@ -55,5 +55,12 @@ func init() {
 
 	ConfigColl = client.Database(config.Database.Name).Collection("config")
 
+	// create unique index for invitation collection
 	InvitationColl = client.Database(config.Database.Name).Collection("invitation")
+	if _, err = InvitationColl.Indexes().CreateOne(ctx, mongo.IndexModel{
+		Keys:	bson.D{{Key: "code", Value: 1}},
+		Options: options.Index().SetUnique(true).SetName("code"),
+	}); err != nil {
+		panic(err)
+	}
 }

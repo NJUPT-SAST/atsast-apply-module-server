@@ -4,7 +4,7 @@ import "github.com/google/uuid"
 
 type Invitation struct {
 	Code    *string     `json:"code" bson:"code,omitempty" binding:"required"`
-	Type    *string     `json:"type" bson:"type,omitempty" binding:"required"`
+	Type    *UserRole   `json:"type" bson:"type,omitempty" binding:"required"`
 	Profile *PreProfile `json:"profile" bson:"profile,omitempty" binding:"required"`
 	UserId  *uuid.UUID  `json:"userId" bson:"userId,omitempty" binding:"required"`
 }

@@ -2,8 +2,6 @@ package logger
 
 import (
 	"os"
-
-	"github.com/google/uuid"
 )
 
 var defaultRequestLogger RequestLogger
@@ -23,6 +21,6 @@ func init() {
 
 }
 
-func LogRequest(api string, userId *uuid.UUID, request interface{}) {
-	defaultRequestLogger.logRequest(api, userId, request)
+func LogRequest(api string, request interface{}) {
+	defaultRequestLogger.logRequest(api, request)
 }

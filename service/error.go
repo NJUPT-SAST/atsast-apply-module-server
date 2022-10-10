@@ -2,4 +2,8 @@ package service
 
 import "errors"
 
-var DocumentNotFoundError = errors.New("document not found")
+var (
+	CallDatabaseErr     = errors.New("calling database error")
+	NotFoundErr         = errors.New("not found error")
+	PermissionDeniedErr = errors.New("permission denied")
+)

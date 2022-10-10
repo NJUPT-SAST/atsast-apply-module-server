@@ -10,31 +10,24 @@ import (
 
 func main() {
 	r := gin.Default()
-	if err := r.SetTrustedProxies(nil); err != nil {
-		panic(err)
-	}
 
 	apiRouter := r.Group("api")
-
-	apiRouter.GET("health", controller.Health)
+	apiRouter.GET("health", controller.CheckHealth)
+	apiRouter.GET("config", controller.ReadConfig)
+	apiRouter.GET("exam", controller.ReadExamList)
 	apiRouter.POST("login", controller.Login)
 
+	invitationRouter := apiRouter.Group("invitation")
+	invitationRouter.Use(middleware.BearerTokenAuth[*jwt.Identity](jwt.ParseIdentityJwtString, jwt.InjectIdentity))
+	invitationRouter.GET("", controller.ReadInvitation)
+
 	userRouter := apiRouter.Group("user")
-	userRouter.Use(middleware.BearerAuth(jwt.ParseIdentityJwtString, jwt.InjectIdentity))
+	userRouter.Use(middleware.BearerTokenAuth[*jwt.Identity](jwt.ParseIdentityJwtString, jwt.InjectIdentity))
+	userRouter.GET("", controller.ReadUser)
 	userRouter.GET(":userId/profile", controller.ReadUserProfile)
 	userRouter.PUT(":userId/profile", controller.UpdateUserProfile)
 	userRouter.GET(":userId/score", controller.ReadUserScore)
 	userRouter.PUT(":userId/score", controller.UpdateUserScore)
-
-	examRouter := apiRouter.Group("exam")
-	examRouter.GET("", controller.ReadExamList)
-
-	configRouter := apiRouter.Group("config")
-	configRouter.GET("", controller.ReadConfig)
-
-	invitationRouter := apiRouter.Group("invitation")
-	invitationRouter.Use(middleware.BearerAuth(jwt.ParseIdentityJwtString, jwt.InjectIdentity))
-	invitationRouter.GET("", controller.ReadInvitation)
 
 	if err := r.Run(); err != nil {
 		panic(err)

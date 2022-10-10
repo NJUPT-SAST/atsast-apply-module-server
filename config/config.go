@@ -9,7 +9,7 @@ import (
 var JwtSecret []byte
 
 var Wechat struct {
-	AppId     string
+	AppId	 string
 	AppSecret string
 }
 

@@ -1,20 +1,17 @@
 package service
 
 import (
-	"go.mongodb.org/mongo-driver/mongo"
-
-	"github.com/njupt-sast/atsast-apply-module-server/dao"
-	"github.com/njupt-sast/atsast-apply-module-server/entity"
+	"github.com/njupt-sast/atsast-apply-module-server/model/dao"
+	"github.com/njupt-sast/atsast-apply-module-server/model/entity"
 )
 
 func ReadConfig() (*entity.Config, error) {
 	config, err := dao.ReadConfig()
-	if err == mongo.ErrNoDocuments {
-		return nil, DocumentNotFoundError
+	if err == dao.NoDocumentsErr {
+		return nil, NotFoundErr
 	}
-
 	if err != nil {
-		return nil, err
+		return nil, CallDatabaseErr
 	}
-	return config, err
+	return config, nil
 }
