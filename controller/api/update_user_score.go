@@ -78,7 +78,7 @@ func UpdateUserScoreRequestHandler(request *UpdateUserScoreRequest) *response.Re
 		return response.Failed().SetMsg(service.PermissionDeniedErr.Error())
 	}
 
-	err = service.UpdateUserScore(request.RequesterId, request.ExamId, request.UserScoreMap)
+	err = service.UpdateUserScore(request.UserId, request.ExamId, request.UserScoreMap)
 	if err != nil {
 		return response.Failed().SetMsg(err.Error())
 	}
