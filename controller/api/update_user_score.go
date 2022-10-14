@@ -70,17 +70,15 @@ func UpdateUserScoreRequestParser(c *gin.Context) (*UpdateUserScoreRequest, erro
 }
 
 func UpdateUserScoreRequestHandler(request *UpdateUserScoreRequest) *response.Response {
-	if *request.RequesterId != *request.UserId {
-		isAdmin, err := service.IsAdmin(request.RequesterId)
-		if err != nil {
-			return response.Failed().SetMsg(err.Error())
-		}
-		if !isAdmin {
-			return response.Failed().SetMsg(service.PermissionDeniedErr.Error())
-		}
+	isAdmin, err := service.IsAdmin(request.RequesterId)
+	if err != nil {
+		return response.Failed().SetMsg(err.Error())
+	}
+	if !isAdmin {
+		return response.Failed().SetMsg(service.PermissionDeniedErr.Error())
 	}
 
-	err := service.UpdateUserScore(request.RequesterId, request.ExamId, request.UserScoreMap)
+	err = service.UpdateUserScore(request.RequesterId, request.ExamId, request.UserScoreMap)
 	if err != nil {
 		return response.Failed().SetMsg(err.Error())
 	}
