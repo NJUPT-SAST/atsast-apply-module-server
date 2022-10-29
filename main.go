@@ -26,6 +26,8 @@ func main() {
 	userRouter.GET("", controller.ReadUser)
 	userRouter.GET(":userId/profile", controller.ReadUserProfile)
 	userRouter.PUT(":userId/profile", controller.UpdateUserProfile)
+	userRouter.GET(":userId/profile/sast", controller.ReadUserSastProfile)
+	userRouter.PUT(":userId/profile/sast", controller.UpdateUserSastProfile)
 	userRouter.GET(":userId/score", controller.ReadUserScore)
 	userRouter.PUT(":userId/score", controller.UpdateUserScore)
 

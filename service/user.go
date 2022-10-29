@@ -18,6 +18,17 @@ func IsAdmin(userId *uuid.UUID) (bool, error) {
 	return user.Role.IsAdmin(), nil
 }
 
+func IsSuperAdmin(userId *uuid.UUID) (bool, error) {
+	user, err := dao.ReadUser(userId)
+	if err == dao.NoDocumentsErr {
+		return false, NotFoundErr
+	}
+	if err != nil {
+		return false, CallDatabaseErr
+	}
+	return user.Role.IsSuperAdmin(), nil
+}
+
 func ReadUserWithCreateIfNotExist(weChatId *string) (*entity.User, error) {
 	return dao.ReadUserWithCreateIfNotExist(weChatId)
 }
@@ -58,6 +69,17 @@ func UpdateUserRole(userId *uuid.UUID, userRole *entity.UserRole) error {
 
 func UpdateUserProfile(userId *uuid.UUID, userProfile *entity.UserProfile) error {
 	err := dao.UpdateUserProfile(userId, userProfile)
+	if err == dao.NoDocumentsErr {
+		return NotFoundErr
+	}
+	if err != nil {
+		return CallDatabaseErr
+	}
+	return nil
+}
+
+func UpdateUserSastProfile(userId *uuid.UUID, userSastProfile *entity.UserSastProfile) error {
+	err := dao.UpdateUserSastProfile(userId, userSastProfile)
 	if err == dao.NoDocumentsErr {
 		return NotFoundErr
 	}

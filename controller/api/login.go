@@ -17,8 +17,8 @@ type LoginRequest struct {
 
 type LoginResponse struct {
 	UserId *uuid.UUID       `json:"userId" binding:"required"`
-	Role   *entity.UserRole `json:"role" binding:"required"`
 	Token  *string          `json:"token" binding:"required"`
+	Role   *entity.UserRole `json:"role" binding:"required"`
 }
 
 func LoginRequestParser(c *gin.Context) (*LoginRequest, error) {

@@ -7,13 +7,19 @@ type Config struct {
 
 type SastConfig struct {
 	DepartmentList []DepartmentConfig `json:"departmentList" bson:"departmentList,omitempty" binding:"required"`
+	JobTitleList   []JobTitleConfig   `json:"jobTitleList" bson:"jobTitleList,omitempty" binding:"required"`
 }
 
 type DepartmentConfig struct {
-	DepartmentId	   string `json:"departmentId" bson:"departmentId,omitempty" binding:"required"`
-	DepartmentName	 string `json:"departmentName" bson:"departmentName,omitempty" binding:"required"`
+	DepartmentId       string `json:"departmentId" bson:"departmentId,omitempty" binding:"required"`
+	DepartmentName     string `json:"departmentName" bson:"departmentName,omitempty" binding:"required"`
 	DepartmentCategory string `json:"departmentCategory" bson:"departmentCategory,omitempty" binding:"required"`
-	CanApply		   bool   `json:"canApply" bson:"canApply,omitempty" binding:"required"`
+	CanApply           bool   `json:"canApply" bson:"canApply,omitempty" binding:"required"`
+}
+
+type JobTitleConfig struct {
+	JobTitleId   *string `json:"jobTitleId" bson:"jobTitleId,omitempty" binding:"required"`
+	JobTitleName *string `json:"jobTitleName" bson:"jobTitleName,omitempty" binding:"required"`
 }
 
 type SchoolConfig struct {
@@ -21,8 +27,8 @@ type SchoolConfig struct {
 }
 
 type College struct {
-	CollegeId   string		`json:"collegeId" bson:"collegeId,omitempty" binding:"required"`
-	CollegeName string		`json:"collegeName" bson:"collegeName,omitempty" binding:"required"`
+	CollegeId   string        `json:"collegeId" bson:"collegeId,omitempty" binding:"required"`
+	CollegeName string        `json:"collegeName" bson:"collegeName,omitempty" binding:"required"`
 	MajorList   []MajorConfig `json:"majorList" bson:"majorList,omitempty" binding:"required"`
 }
 

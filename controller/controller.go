@@ -10,16 +10,18 @@ import (
 )
 
 var (
-	CheckHealth       = NewPureController(api.CheckHealth)
-	ReadConfig        = NewPureController(api.ReadConfig)
-	ReadExamList      = NewPureController(api.ReadExamList)
-	Login             = NewController[*api.LoginRequest](api.LoginRequestParser, api.LoginRequestHandler)
-	ReadInvitation    = NewController[*api.ReadInvitationRequest](api.ReadInvitationRequestParser, api.ReadInvitationRequestHandler)
-	ReadUser          = NewController[*api.ReadUserRequest](api.ReadUserRequestParser, api.ReadUserRequestHandler)
-	ReadUserProfile   = NewController[*api.ReadUserProfileRequest](api.ReadUserProfileRequestParser, api.ReadUserProfileRequestHandler)
-	UpdateUserProfile = NewController[*api.UpdateUserProfileRequest](api.UpdateUserProfileRequestParser, api.UpdateUserProfileRequestHandler)
-	ReadUserScore     = NewController[*api.ReadUserScoreRequest](api.ReadUserScoreRequestParser, api.ReadUserScoreRequestHandler)
-	UpdateUserScore   = NewController[*api.UpdateUserScoreRequest](api.UpdateUserScoreRequestParser, api.UpdateUserScoreRequestHandler)
+	CheckHealth           = NewPureController(api.CheckHealth)
+	ReadConfig            = NewPureController(api.ReadConfig)
+	ReadExamList          = NewPureController(api.ReadExamList)
+	Login                 = NewController[*api.LoginRequest](api.LoginRequestParser, api.LoginRequestHandler)
+	ReadInvitation        = NewController[*api.ReadInvitationRequest](api.ReadInvitationRequestParser, api.ReadInvitationRequestHandler)
+	ReadUser              = NewController[*api.ReadUserRequest](api.ReadUserRequestParser, api.ReadUserRequestHandler)
+	ReadUserProfile       = NewController[*api.ReadUserProfileRequest](api.ReadUserProfileRequestParser, api.ReadUserProfileRequestHandler)
+	UpdateUserProfile     = NewController[*api.UpdateUserProfileRequest](api.UpdateUserProfileRequestParser, api.UpdateUserProfileRequestHandler)
+	ReadUserSastProfile   = NewController[*api.ReadUserSastProfileRequest](api.ReadUserSastProfileRequestParser, api.ReadUserSastProfileRequestHandler)
+	UpdateUserSastProfile = NewController[*api.UpdateUserSastProfileRequest](api.UpdateUserSastProfileRequestParser, api.UpdateUserSastProfileRequestHandler)
+	ReadUserScore         = NewController[*api.ReadUserScoreRequest](api.ReadUserScoreRequestParser, api.ReadUserScoreRequestHandler)
+	UpdateUserScore       = NewController[*api.UpdateUserScoreRequest](api.UpdateUserScoreRequestParser, api.UpdateUserScoreRequestHandler)
 )
 
 type PureRequestHandlerFunc func() *response.Response

@@ -7,11 +7,12 @@ import (
 )
 
 type User struct {
-	UserId   *uuid.UUID   `json:"userId" bson:"userId,omitempty" binding:"required"`
-	WeChatId *string      `json:"weChatId" bson:"weChatId,omitempty"`
-	Profile  *UserProfile `json:"profile" bson:"profile,omitempty"`
-	ExamMap  *UserExamMap `json:"examMap" bson:"scoreMap,omitempty"`
-	Role     *UserRole    `json:"role" bson:"role,omitempty"`
+	UserId      *uuid.UUID       `json:"userId" bson:"userId,omitempty" binding:"required"`
+	WeChatId    *string          `json:"weChatId" bson:"weChatId,omitempty"`
+	Profile     *UserProfile     `json:"profile" bson:"profile,omitempty"`
+	ExamMap     *UserExamMap     `json:"examMap" bson:"scoreMap,omitempty"`
+	Role        *UserRole        `json:"role" bson:"role,omitempty"`
+	SastProfile *UserSastProfile `json:"sastProfile" bson:"sastProfile,omitempty"`
 }
 
 type UserProfile struct {
@@ -53,8 +54,17 @@ func (userRole *UserRole) IsAdmin() bool {
 	return userRole != nil && (*userRole == AdminUser || *userRole == SuperAdminUser)
 }
 
+func (userRole *UserRole) IsSuperAdmin() bool {
+	return userRole != nil && *userRole == SuperAdminUser
+}
+
 var (
 	CommonUser     UserRole = "user"
 	AdminUser      UserRole = "admin"
 	SuperAdminUser UserRole = "super admin"
 )
+
+type UserSastProfile struct {
+	DepartmentId *string `json:"departmentId" bson:"departmentId,omitempty" binding:"required"`
+	JobTitleId   *string `json:"jobTitleId" bson:"jobTitleId,omitempty" binding:"required"`
+}

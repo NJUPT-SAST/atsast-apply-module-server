@@ -108,6 +108,23 @@ func UpdateUserProfile(userId *uuid.UUID, userProfile *entity.UserProfile) error
 	return result.Err()
 }
 
+func UpdateUserSastProfile(userId *uuid.UUID, userSastProfile *entity.UserSastProfile) error {
+	ctx, cancel := context.WithTimeout(context.TODO(), timeLimit)
+	defer cancel()
+
+	result := UserColl.FindOneAndUpdate(
+		ctx,
+		bson.D{{Key: "userId", Value: userId}},
+		bson.D{{Key: "$set", Value: bson.D{
+			{Key: "sastProfile", Value: userSastProfile},
+		}}},
+	)
+	if result.Err() == mongo.ErrNoDocuments {
+		return NoDocumentsErr
+	}
+	return result.Err()
+}
+
 func UpdateUserScore(userId *uuid.UUID, examId *string, userScoreMap *entity.UserScoreMap) error {
 	ctx, cancel := context.WithTimeout(context.TODO(), timeLimit)
 	defer cancel()
