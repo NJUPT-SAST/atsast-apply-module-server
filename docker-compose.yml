@@ -4,7 +4,6 @@ services:
   server:
     build:
       context: .
-      dockerfile: dockerfile
     container_name: atsast-apply-module-server
     ports:
       - "8080:8080"
